@@ -18,7 +18,7 @@ class Modpack:
         self._mods: list[Mod] = []
         # id wylaczonych modow, zostaja w modpacku ale nie ida do gry
         self._disabled_mods: set[str] = set()
-        self._created_at = datetime.now()  # data utworzenia
+        self._created_at = datetime.now()  # data utworz.
 
     @property
     def id(self) -> str:
