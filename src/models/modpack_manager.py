@@ -1,4 +1,4 @@
-"""Klasa ModpackManager: przechowuje wszystkie modpacki użytkownika."""
+# klasa ModpackManager, trzyma wszystkie modpacki uzytkownika
 
 from __future__ import annotations
 
@@ -9,22 +9,22 @@ from .modpack import Modpack
 
 class ModpackManager:
     def __init__(self, data_dir: str) -> None:
-        # Kompozycja ModpackManager ◆— Modpack (1 — 0..*): menedżer sam tworzy modpacki i je przechowuje
+        # kompozycja z Modpack, menedzer sam tworzy modpacki i bez niego one nie istnieja
         self._modpacks: list[Modpack] = []
-        self._data_dir = data_dir
+        self._data_dir = data_dir  # folder na dane, przyda sie przy zapisie na dysk
 
     @property
     def modpacks(self) -> list[Modpack]:
-        return list(self._modpacks)
+        return list(self._modpacks)  # zwracamy kopie zeby nikt nie zmienil listy z zewnatrz
 
+    # tworzy nowy pusty modpack (UC01)
     def create_modpack(self, name: str, game_version: str, loader: str) -> Modpack:
-        """Tworzy nowy, pusty modpack (UC01)."""
-        modpack = Modpack(str(uuid.uuid4()), name, game_version, loader)
+        modpack = Modpack(str(uuid.uuid4()), name, game_version, loader)  # uuid daje unikalne id
         self._modpacks.append(modpack)
         return modpack
 
+    # usuwa modpack po id
     def delete_modpack(self, modpack_id: str) -> None:
-        """Usuwa modpack; razem z nim znikają jego dane (kompozycja)."""
         self._modpacks = [m for m in self._modpacks if m.id != modpack_id]
 
-    # Import/eksport, kopie zapasowe oraz save()/load() dodamy na kolejnych etapach (UC05–UC07, „Baza danych”)
+    # import, eksport, kopie zapasowe i save load dodamy na kolejnych labach

@@ -1,4 +1,4 @@
-"""Pakiet z klasami z diagramu klas UML."""
+# pakiet z klasami z diagramu, dzieki temu w main.py wystarczy from models import ...
 
 from .mod import Mod
 from .modpack import Modpack

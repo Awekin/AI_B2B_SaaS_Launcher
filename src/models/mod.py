@@ -1,9 +1,10 @@
-"""Klasa Mod: opis jednej modyfikacji (wersja, loader, zależności, konflikty)."""
+# klasa Mod, opisuje jeden mod
 
 from __future__ import annotations
 
 
 class Mod:
+    # konstruktor, zapisujemy dane moda tak jak na diagramie
     def __init__(
         self,
         mod_id: str,
@@ -19,12 +20,13 @@ class Mod:
         self._name = name
         self._version = version
         self._game_version = game_version
-        self._loader = loader.lower()
-        # Zależności i konflikty to listy identyfikatorów innych modów
+        self._loader = loader.lower()  # male litery zeby Fabric i fabric byly tym samym
+        # tu trzymamy tylko id innych modow, nie cale obiekty
         self._dependencies = list(dependencies or [])
         self._incompatible_with = list(incompatible_with or [])
         self._file_name = file_name
 
+    # zeby mozna bylo odczytac id i nazwe z zewnatrz, ale nie zmienic
     @property
     def id(self) -> str:
         return self._id
@@ -33,13 +35,14 @@ class Mod:
     def name(self) -> str:
         return self._name
 
+    # sprawdza czy mod pasuje do wersji gry i loadera
     def is_compatible(self, game_version: str, loader: str) -> bool:
-        """Czy mod pasuje do wersji gry i loadera."""
         return self._game_version == game_version and self._loader == loader.lower()
 
+    # sprawdza czy mod nie gryzie sie z innym modem, konflikt moze byc zapisany w ktoryms z nich
     def conflicts_with(self, other: Mod) -> bool:
-        """Czy mod koliduje z innym modem (konflikt może być zapisany po dowolnej stronie)."""
         return other._id in self._incompatible_with or self._id in other._incompatible_with
 
+    # jak mod wyglada w print
     def __repr__(self) -> str:
         return f"Mod({self._name} {self._version}, {self._loader} {self._game_version})"
