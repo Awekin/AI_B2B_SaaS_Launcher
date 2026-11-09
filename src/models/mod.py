@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from .validation import require_text, validate_game_version, validate_loader
+
 
 class Mod:
     # konstruktor, zapisujemy dane moda tak jak na diagramie
+    # najpierw sprawdzamy dane, przy zlych danych obiekt w ogole nie powstanie
     def __init__(
         self,
         mod_id: str,
@@ -16,11 +19,11 @@ class Mod:
         incompatible_with: list[str] | None = None,
         file_name: str = "",
     ) -> None:
-        self._id = mod_id
-        self._name = name
-        self._version = version
-        self._game_version = game_version
-        self._loader = loader.lower()  # male litery zeby Fabric i fabric byly tym samym
+        self._id = require_text(mod_id, "id moda")
+        self._name = require_text(name, "nazwa moda")
+        self._version = require_text(version, "wersja moda")
+        self._game_version = validate_game_version(game_version)
+        self._loader = validate_loader(loader)  # male litery zeby Fabric i fabric byly tym samym
         # tu trzymamy tylko id innych modow, nie cale obiekty
         self._dependencies = list(dependencies or [])
         self._incompatible_with = list(incompatible_with or [])
