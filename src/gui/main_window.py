@@ -35,7 +35,7 @@ class MainWindow:
         self.version_entry.grid(row=1, column=1, sticky="w", pady=2)
 
         ttk.Label(form, text="Loader:").grid(row=2, column=0, sticky="w", pady=2)
-        # Combobox to lista do wyboru, readonly zeby nie dalo sie wpisac czegos innego
+        # Combobox
         self.loader_box = ttk.Combobox(form, values=LOADERS, state="readonly", width=27)
         self.loader_box.current(0)
         self.loader_box.grid(row=2, column=1, sticky="w", pady=2)
@@ -46,7 +46,7 @@ class MainWindow:
         ttk.Button(buttons, text="Utwórz modpack", command=self.create_modpack).pack(side="left")
         ttk.Button(buttons, text="Usuń zaznaczony", command=self.delete_modpack).pack(side="left", padx=5)
 
-        # Treeview to tabela, tu pokazujemy modpacki z bazy
+        # Treeview
         columns = ("name", "loader", "version", "mods", "created")
         self.table = ttk.Treeview(self.root, columns=columns, show="headings", height=10)
         self.table.heading("name", text="Nazwa")

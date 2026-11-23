@@ -11,16 +11,16 @@ from models import ModpackManager
 # folder data obok folderu src, tam jest plik database.db
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 
-
+ 
 def main() -> None:
-    manager = ModpackManager(DATA_DIR)  # logika + baza z LAB 6
+    manager = ModpackManager(DATA_DIR)  # logika + baza
     manager.load()  # dane z poprzedniego uruchomienia
 
     root = tk.Tk()  # glowne okno
     MainWindow(root, manager)  # buduje widgety w oknie
-    root.mainloop()  # okno dziala i czeka na klikniecia, az go nie zamkniemy
+    root.mainloop()  # czeka na klikniecia
 
-    manager.close()  # po zamknieciu okna zamykamy baze
+    manager.close()  # zamyk. bazy
 
 
 if __name__ == "__main__":
