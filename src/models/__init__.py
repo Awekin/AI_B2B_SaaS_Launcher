@@ -8,6 +8,7 @@ from .exceptions import (
     NotFoundError,
     ValidationError,
 )
+from .database import Database
 from .mod import Mod
 from .modpack import Modpack
 from .modpack_manager import ModpackManager
@@ -16,6 +17,7 @@ __all__ = [
     "Mod",
     "Modpack",
     "ModpackManager",
+    "Database",
     "LauncherError",
     "ValidationError",
     "DuplicateError",

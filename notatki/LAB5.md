@@ -10,7 +10,7 @@
 
 | Требование | Что показываем |
 |---|---|
-| Выбранный UC из документации | UC01, UC04 (вместе с UC03) из `przypadki_uzycia.md` |
+| Выбранный UC из документации | UC01, UC04 (вместе с UC03), UC05, UC06 из `przypadki_uzycia_v2.md` |
 | Запуск функции | `python3 src/main.py` |
 | Классы и методы, которые её делают | таблица в разделе 4 |
 | Пример ошибочных данных / проверки | блоки «błędne dane» в выводе |
@@ -75,16 +75,24 @@ src/main.py              показывает правильные и ошибо
 | `Modpack.__init__` | загрузчик из списка | `ValidationError` | 3b |
 | `create_modpack` (modpack_manager.py:22) | нет модпака с таким названием | `DuplicateError` | 3a |
 
-### UC04 — Zarządzaj modami (+ UC03 — Sprawdź kompatybilność)
+### UC04 — Dodaj mod do modpacka (+ UC03 — Sprawdź kompatybilność modów)
 **Классы:** `Modpack`, `Mod`. UC03 входит в UC04 через «include» на диаграмме UC.
+
+| Где | Что проверяется | Ошибка | Сценарий |
+|---|---|---|---|
+| `Mod.__init__` (mod.py:11) | id, название, версия не пустые; версия игры и загрузчик правильные | `ValidationError` | — |
+| `add_mod` шаг 1 (modpack.py:46) | мода ещё нет в модпаке | `DuplicateError` | 2a |
+| `add_mod` шаг 2 (modpack.py:49) | мод подходит по версии и загрузчику — спрашиваем `mod.is_compatible` | `IncompatibleModError` | 2b |
+| `add_mod` шаг 3 (modpack.py:54) | **UC03:** мод не конфликтует ни с одним модом — спрашиваем `mod.conflicts_with` | `ModConflictError` | 2c |
+
+### UC05 — Usuń mod z modpacka, UC06 — Włącz / wyłącz mod
+**Класс:** `Modpack`.
 
 | Где | Что проверяется | Ошибка |
 |---|---|---|
-| `Mod.__init__` (mod.py:11) | id, название, версия не пустые; версия игры и загрузчик правильные | `ValidationError` |
-| `add_mod` шаг 1 (modpack.py:46) | мода ещё нет в модпаке | `DuplicateError` |
-| `add_mod` шаг 2 (modpack.py:49) | мод подходит по версии и загрузчику — спрашиваем `mod.is_compatible` | `IncompatibleModError` |
-| `add_mod` шаг 3 (modpack.py:54) | **UC03:** мод не конфликтует ни с одним модом — спрашиваем `mod.conflicts_with` | `ModConflictError` (сценарий 5a) |
-| `remove_mod` / `toggle_mod` | такой мод есть в модпаке | `NotFoundError` |
+| `remove_mod` (modpack.py:60), `toggle_mod` (modpack.py:68) | такой мод есть в модпаке | `NotFoundError` |
+
+> Номера UC — по диаграмме вариантов использования **v2** (`przypadki_uzycia_v2.md`). В v1 всё это было одним UC04 «Zarządzaj modami» — преподаватель попросил разбить на конкретные действия.
 
 **Współpraca obiektów:** модпак не решает сам, подходит ли мод, — он спрашивает сам мод (`is_compatible`, `conflicts_with`).
 
@@ -103,9 +111,11 @@ src/main.py              показывает правильные и ошибо
   Odrzucono [IncompatibleModError]: Mod 'Create' nie pasuje do modpacka (fabric 1.20.1).
   Odrzucono [ModConflictError]: Mod 'OptiFabric' koliduje z modem 'Sodium'.
   Odrzucono [ValidationError]: Pole 'id moda' nie może być puste.
+
+== UC05: błędne dane ==
   Odrzucono [NotFoundError]: W modpacku 'Optymalizacja' nie ma moda o id 'jei'.
 
-== UC04: wyłączenie moda ==
+== UC06: wyłączenie moda ==
   Aktywne mody: Fabric API, Sodium
   Stan modpacka: Modpack(Optymalizacja, fabric 1.20.1, modów: 3)   ← после ошибок модпак цел
 ```
@@ -115,7 +125,7 @@ src/main.py              показывает правильные и ошибо
 
 ## 6. Сценарий показа (≈ 5 минут)
 
-1. **Назвать UC.** «Pokażę UC01 — tworzenie modpacka i UC04 — zarządzanie modami, razem z UC03 — sprawdzeniem kompatybilności. Są w dokumentacji z LAB 2.»
+1. **Назвать UC.** «Pokażę UC01 — tworzenie modpacka i UC04 — dodawanie moda, razem z UC03 — sprawdzeniem kompatybilności. Dodatkowo UC05 i UC06 — usuwanie i wyłączanie moda. Numery są z poprawionego diagramu przypadków użycia v2.»
 2. **Запустить** `python3 src/main.py`.
 3. **UC01, правильные данные:** Cmd + клик на `create_modpack` → «menedżer tworzy modpack, konstruktor Modpack sprawdza dane».
 4. **UC01, ошибки:** показать 4 строки «Odrzucono». Cmd + клик на `Modpack(` → `__init__` → «tu jest walidacja danych: `require_text`, `validate_game_version`, `validate_loader`». Cmd + клик на `validate_loader` → показать проверку.
@@ -128,8 +138,8 @@ src/main.py              показывает правильные и ошибо
 
 | Вопрос | Ответ |
 |---|---|
-| Który Use Case właśnie pokazałeś? | UC01 — tworzenie modpacka i UC04 — zarządzanie modami, razem z UC03 — sprawdzeniem kompatybilności, które jest w UC04 przez «include». |
-| Które klasy za niego odpowiadają? | UC01: ModpackManager i Modpack. UC04 i UC03: Modpack i Mod. Błędy są w exceptions.py. |
+| Który Use Case właśnie pokazałeś? | UC01 — tworzenie modpacka i UC04 — dodawanie moda, razem z UC03 — sprawdzeniem kompatybilności, które jest w UC04 przez «include». Do tego UC05 i UC06 — usuwanie i wyłączanie moda. |
+| Które klasy za niego odpowiadają? | UC01: ModpackManager i Modpack. UC04 i UC03: Modpack i Mod. UC05 i UC06: Modpack. Błędy są w exceptions.py. |
 | Gdzie jest walidacja? | Na dwóch poziomach. Dane — w konstruktorach Mod i Modpack, przez funkcje z validation.py. Reguły — w metodach: add_mod, remove_mod, toggle_mod, create_modpack. |
 | Co stanie się przy błędnych danych? | Rzucany jest wyjątek, main.py go łapie i wypisuje komunikat. Obiekt nie powstaje albo modpack zostaje bez zmian — program się nie wysypuje. |
 | Gdzie jest dziedziczenie? | W wyjątkach: każdy błąd dziedziczy po LauncherError, bo JEST błędem launchera. W klasach modelu nie dodawaliśmy dziedziczenia na siłę. |

@@ -18,7 +18,15 @@ from .validation import MAX_NAME_LENGTH, require_text, validate_game_version, va
 class Modpack:
     # konstruktor, atrybuty jak na diagramie
     # dane sprawdzamy od razu, wiec zly modpack nie powstanie (UC01 scenariusz 3b)
-    def __init__(self, modpack_id: str, name: str, game_version: str, loader: str) -> None:
+    # created_at podajemy tylko przy odczycie z bazy, nowy modpack bierze aktualna date
+    def __init__(
+        self,
+        modpack_id: str,
+        name: str,
+        game_version: str,
+        loader: str,
+        created_at: datetime | None = None,
+    ) -> None:
         self._id = require_text(modpack_id, "id modpacka")
         self._name = require_text(name, "nazwa modpacka")
         if len(self._name) > MAX_NAME_LENGTH:
@@ -29,7 +37,7 @@ class Modpack:
         self._mods: list[Mod] = []
         # id wylaczonych modow, zostaja w modpacku ale nie ida do gry
         self._disabled_mods: set[str] = set()
-        self._created_at = datetime.now()  # data utworz.
+        self._created_at = created_at or datetime.now()  # data utworz.
 
     @property
     def id(self) -> str:
@@ -38,6 +46,27 @@ class Modpack:
     @property
     def name(self) -> str:
         return self._name
+
+    # odczyty dla bazy danych (LAB 6)
+    @property
+    def game_version(self) -> str:
+        return self._game_version
+
+    @property
+    def loader(self) -> str:
+        return self._loader
+
+    @property
+    def created_at(self) -> datetime:
+        return self._created_at
+
+    @property
+    def mods(self) -> list[Mod]:
+        return list(self._mods)  # kopia listy, dodawac mozna tylko przez add_mod
+
+    # czy mod jest wlaczony, w bazie to kolumna enabled
+    def is_enabled(self, mod_id: str) -> bool:
+        return mod_id not in self._disabled_mods
 
     # dodaje mod (UC04), przed dodaniem trzy sprawdzenia
     # jesli ktores nie przejdzie, mod nie zostaje dodany i modpack sie nie zmienia
@@ -50,13 +79,13 @@ class Modpack:
             raise IncompatibleModError(
                 f"Mod '{mod.name}' nie pasuje do modpacka ({self._loader} {self._game_version})."
             )
-        # 3. sprawdzenie kompatybilnosci z innymi modami (UC03, scenariusz 5a z UC04)
+        # 3. sprawdzenie kompatybilnosci z innymi modami (UC03, scenariusz 2c z UC04)
         for other in self._mods:
             if mod.conflicts_with(other):
                 raise ModConflictError(f"Mod '{mod.name}' koliduje z modem '{other.name}'.")
         self._mods.append(mod)
 
-    # usuwa mod z listy i z wylaczonych
+    # usuwa mod z listy i z wylaczonych (UC05)
     def remove_mod(self, mod_id: str) -> None:
         mod = self._find(mod_id)
         if mod is None:
@@ -64,7 +93,7 @@ class Modpack:
         self._mods.remove(mod)
         self._disabled_mods.discard(mod_id)
 
-    # wlacza albo wylacza mod, nie usuwa go
+    # wlacza albo wylacza mod, nie usuwa go (UC06)
     def toggle_mod(self, mod_id: str) -> None:
         if self._find(mod_id) is None:
             raise NotFoundError(f"W modpacku '{self._name}' nie ma moda o id '{mod_id}'.")

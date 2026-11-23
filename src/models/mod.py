@@ -38,6 +38,31 @@ class Mod:
     def name(self) -> str:
         return self._name
 
+    # te odczyty sa potrzebne bazie danych, zeby zapisac wszystkie pola moda (LAB 6)
+    @property
+    def version(self) -> str:
+        return self._version
+
+    @property
+    def game_version(self) -> str:
+        return self._game_version
+
+    @property
+    def loader(self) -> str:
+        return self._loader
+
+    @property
+    def dependencies(self) -> list[str]:
+        return list(self._dependencies)  # kopia zeby nikt nie zmienil listy
+
+    @property
+    def incompatible_with(self) -> list[str]:
+        return list(self._incompatible_with)
+
+    @property
+    def file_name(self) -> str:
+        return self._file_name
+
     # sprawdza czy mod pasuje do wersji gry i loadera
     def is_compatible(self, game_version: str, loader: str) -> bool:
         return self._game_version == game_version and self._loader == loader.lower()
